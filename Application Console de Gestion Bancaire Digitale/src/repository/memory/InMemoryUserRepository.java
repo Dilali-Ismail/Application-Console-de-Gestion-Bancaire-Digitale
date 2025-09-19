@@ -20,4 +20,15 @@ public class InMemoryUserRepository implements UserRepository {
                 .filter(u -> u.getEmail().equalsIgnoreCase(email))
                 .findFirst();
     }
+    @Override
+    public void updateUser(User updatedUser) {
+        for (int i = 0; i < users.size(); i++) {
+            User user = users.get(i);
+            if (user.getId().equals(updatedUser.getId())) {
+                users.set(i, updatedUser);
+                return;
+            }
+        }
+        System.out.println("Utilisateur non trouve pour la mise a jour");
+    }
 }

@@ -3,6 +3,7 @@ package ui;
 import model.User;
 import service.AccountService;
 import service.AuthService;
+import service.TransactionService;
 
 import java.util.Scanner;
 
@@ -10,10 +11,12 @@ public class Menu {
     private final AuthService authService;
     private final AccountService accountService;
     private final Scanner sc = new Scanner(System.in);
+    private final TransactionService transactionService;
 
-    public Menu(AuthService authService, AccountService accountService) {
+    public Menu(AuthService authService, AccountService accountService , TransactionService transactionService) {
         this.authService = authService;
         this.accountService = accountService;
+        this.transactionService = transactionService;
     }
     public void afficherMenu() {
         while (true) {
@@ -49,7 +52,11 @@ public class Menu {
             System.out.println("****** MENU UTILISATEUR ******");
             System.out.println("1. Créer un compte bancaire");
             System.out.println("2. Lister votre compts");
-            System.out.println("3. Déconnexion");
+            System.out.println("3. Effectuer un depot");
+            System.out.println("4. Effectuer un retrait");
+            System.out.println("5. Effectuer un virement");
+            System.out.println("6. Changer le mot de passe");
+            System.out.println("7. Déconnexion");
             System.out.print("Votre choix : ");
             int choix = sc.nextInt();
             sc.nextLine();
@@ -59,7 +66,11 @@ public class Menu {
                 case 2 -> {
                     accountService.listerAccount(user);
                 }
-                case 3 ->{
+                case 3 ->{ effectuerDepot(); }
+                case 4 -> {effectuerRetrait();}
+                case 5 -> {effectuerVirement();}
+                case 6 ->{authService.changePassword();}
+                case 7 ->{
                     authService.logout();
                     return;
                 }
@@ -67,5 +78,63 @@ public class Menu {
             }
         }
     }
+    private void effectuerDepot() {
+        User user = authService.getLoggedInUser();
+        if (user == null) {
+            System.out.println("Aucun utilisateur connecté.");
+            return;
+        }
 
+        System.out.println("***** DÉPÔT *****");
+        accountService.listerAccount(user); // Lister les comptes de l'utilisateur
+
+        System.out.print("Entrez l'ID du compte : ");
+        String accountId = sc.nextLine();
+
+        System.out.print("Montant à déposer : ");
+        double amount = sc.nextDouble();
+        sc.nextLine(); // Nettoyer le buffer
+        transactionService.Deposit(accountId, amount);
+    }
+    private void effectuerRetrait() {
+        User user = authService.getLoggedInUser();
+        if (user == null) {
+            System.out.println("Aucun utilisateur connecté.");
+            return;
+        }
+
+        System.out.println("***** RETRAIT *****");
+        accountService.listerAccount(user);
+
+        System.out.print("Entrez l'ID du compte : ");
+        String accountId = sc.nextLine();
+
+        System.out.print("Montant à retirer : ");
+        double amount = sc.nextDouble();
+        sc.nextLine(); // Nettoyer le buffer
+
+        transactionService.withdraw(accountId, amount);
+    }
+    private void effectuerVirement() {
+        User user = authService.getLoggedInUser();
+        if (user == null) {
+            System.out.println("Aucun utilisateur connecté.");
+            return;
+        }
+
+        System.out.println("***** VIREMENT *****");
+        accountService.listerAccount(user);
+
+        System.out.print("Entrez l'ID du compte source : ");
+        String fromAccountId = sc.nextLine();
+
+        System.out.print("Entrez l'ID du compte destination : ");
+        String toAccountId = sc.nextLine();
+
+        System.out.print("Montant à transférer : ");
+        double amount = sc.nextDouble();
+        sc.nextLine(); // Nettoyer le buffer
+
+        transactionService.transfer(fromAccountId, toAccountId, amount);
+    }
 }

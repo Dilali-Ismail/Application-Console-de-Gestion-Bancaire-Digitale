@@ -45,7 +45,40 @@ public class AuthService {
     public User getLoggedInUser() {
         return loggedInUser;
     }
+    public void changePassword() {
+        if (loggedInUser == null) {
+            System.out.println("Aucun utilisateur connecté.");
+            return;
+        }
 
+        System.out.println("***** CHANGEMENT DE MOT DE PASSE *****");
+        System.out.print("Ancien mot de passe : ");
+        String oldPassword = sc.nextLine();
+
+        if (!loggedInUser.getPassword().equals(oldPassword)) {
+            System.out.println("Ancien mot de passe incorrect !");
+            return;
+        }
+
+        System.out.print("Nouveau mot de passe (min 6 caractères) : ");
+        String newPassword = sc.nextLine();
+
+        if (newPassword.length() < 6) {
+            System.out.println("Le mot de passe doit contenir au moins 6 caractères !");
+            return;
+        }
+
+        // Dans une vraie application, on mettrait à jour le repository
+        // Pour l'instant, on modifie directement l'objet utilisateur
+        // (Dans une version finale, il faudrait un UserRepository.updateUser())
+        loggedInUser = new User(
+                loggedInUser.getFullName(),
+                loggedInUser.getEmail(),
+                newPassword
+        );
+
+        System.out.println("Mot de passe changé avec succès !");
+    }
     public void logout() {
         loggedInUser = null;
         System.out.println("Déconnecté !");

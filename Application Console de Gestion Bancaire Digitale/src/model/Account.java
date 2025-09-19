@@ -34,4 +34,8 @@ public class Account {
     public boolean isActive() {
         return active;
     }
+
+    public void setBalance(double balance) {
+        this.balance = balance;
+    }
 }
